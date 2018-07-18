@@ -3,10 +3,14 @@ import { DragSource } from "react-dnd"
 
 const itemSource = {
     beginDrag(props) {
-        console.log('dragging')
         return props.item
     },
     endDrag(props, monitor, component) {
+        if (!monitor.didDrop()) {
+            // drop outside the target
+            return;
+        }
+        // drop inside the target, let the handleDrop
         return props.handleDrop(props.item.id)
     }
 }
