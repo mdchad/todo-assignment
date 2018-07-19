@@ -55,8 +55,8 @@ class App extends Component {
     }
 
     moveCard = (dragIndex, hoverIndex) => {
-        const { cards } = this.state
-        const dragCard = cards[dragIndex]
+        const { boardsCards } = this.state
+        const dragCard = boardsCards[dragIndex]
 
         console.log(dragIndex, hoverIndex, dragCard)
         this.setState(
@@ -79,9 +79,11 @@ class App extends Component {
     submit = (e, cardId, index) => {
         e.preventDefault();
         let inputField = this.state.inputText
-        this.state.inputText = ''
         this.setState(
             update(this.state, {
+                inputText: {
+                    $set: ''
+                },
                 boardsCards: {
                     [index]: {
                         items: {
@@ -94,19 +96,19 @@ class App extends Component {
                 }
             })
         )
-        console.log(this.state.boardsCards)
     }
 
     submitCard = (e) => {
         e.preventDefault();
-        let inputField = this.state.cardTitle
-        this.state.cardTitle = ''
         this.setState(
             update(this.state, {
+                cardTitle: {
+                    $set: ''
+                },
                 boardsCards: {
                     $push: [{
                         id: this.state.boardsCards.length + 1,
-                        title: inputField,
+                        title: this.state.cardTitle,
                         items: []
                     }]
                 }
@@ -120,7 +122,7 @@ class App extends Component {
     }
 
     inputCardChange = (e) => {
-        this.setState({cardTitle: e.target.value})
+        this.setState({ cardTitle: e.target.value })
     }
 
     render() {
@@ -149,15 +151,22 @@ class App extends Component {
                                   moveCard={this.moveCard}/>
 
                         ))}
-                        <form key={boardsCard.id} style={{margin: '1em 2em'}} onSubmit={(e) => this.submit(e, boardsCard.id, i)}>
-                            <input onChange={(e) => this.inputChange(e)} /><button type='submit'>Submit</button>
+                        <form key={boardsCard.id}
+                              style={{margin: '1em 2em'}}
+                              onSubmit={(e) => this.submit(e, boardsCard.id, i)}>
+                            <input onChange={(e) => this.inputChange(e)}
+                                   value={this.state.inputText}/>
+                            <button type='submit'>Add Item</button>
                         </form>
                     </div>
                 ))}
                 <hr/>
                 <form style={{margin: '1em 2em'}} onSubmit={(e) => this.submitCard(e)}>
                     <label>New Card:</label>
-                    <input value={this.state.cardTitle} onChange={(e) => this.inputCardChange(e)} /><button type='submit'>Submit</button>
+                    <input value={this.state.cardTitle}
+                           onChange={(e) => this.inputCardChange(e)}
+                           required/>
+                    <button type='submit'>Add Card</button>
                 </form>
             </div>
         )
