@@ -76,28 +76,25 @@ class App extends Component {
         })
     }
 
-    submit = (e, cardId) => {
+    submit = (e, cardId, index) => {
         e.preventDefault();
         let inputField = this.state.inputText
         this.state.inputText = ''
-        // let newCards = this.state.boardsCards.map((card, i) => {
-        //     if (card.id === cardId) {
-        //         return card
-        //     }
-        // })
-        // console.log(newCards)
         this.setState(
             update(this.state, {
-                boardsCards: [{
-                    items: {
-                        $push: [{
-                            id: this.state.cards.length + 1,
-                            text: inputField
-                        }]
+                boardsCards: {
+                    [index]: {
+                        items: {
+                            $push: [{
+                                id: this.state.boardsCards[index].items.length + 1,
+                                text: inputField
+                            }]
+                        }
                     }
-                }]
+                }
             })
         )
+        console.log(this.state.boardsCards)
     }
 
     submitCard = (e) => {
@@ -152,11 +149,12 @@ class App extends Component {
                                   moveCard={this.moveCard}/>
 
                         ))}
-                        <form key={boardsCard.id} style={{margin: '1em 2em'}} onSubmit={(e) => this.submit(e, boardsCard.id)}>
+                        <form key={boardsCard.id} style={{margin: '1em 2em'}} onSubmit={(e) => this.submit(e, boardsCard.id, i)}>
                             <input onChange={(e) => this.inputChange(e)} /><button type='submit'>Submit</button>
                         </form>
                     </div>
                 ))}
+                <hr/>
                 <form style={{margin: '1em 2em'}} onSubmit={(e) => this.submitCard(e)}>
                     <label>New Card:</label>
                     <input value={this.state.cardTitle} onChange={(e) => this.inputCardChange(e)} /><button type='submit'>Submit</button>
