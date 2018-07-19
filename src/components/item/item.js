@@ -16,6 +16,7 @@ const cardSource = {
         return {
             id: props.id,
             index: props.index,
+            cardI: props.cardIndex
         }
     },
 }
@@ -27,6 +28,7 @@ const cardTarget = {
         }
         const dragIndex = monitor.getItem().index
         const hoverIndex = props.index
+        const draggingCardIndex = monitor.getItem().cardI
 
         // Don't replace items with themselves
         if (dragIndex === hoverIndex) {
@@ -61,7 +63,7 @@ const cardTarget = {
         }
 
         // Time to actually perform the action
-        props.moveCard(dragIndex, hoverIndex, props.cardIndex)
+        props.moveCard(dragIndex, hoverIndex, props.cardIndex, draggingCardIndex)
 
         // Note: we're mutating the monitor itemOld here!
         // Generally it's better to avoid mutations,

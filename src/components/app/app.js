@@ -3,33 +3,58 @@ import './app.css';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd'
 import Card from "../card/card"
-import Item from '../item/item'
 const update = require('immutability-helper')
+const uuid = require('uuid/v1');
 
 class App extends Component {
     state = {
         inputText: [''],
         cardTitle: '',
         cards: [
-            { id: 1, title: 'hello world', items: [ {id: 1, text: 'heyyyaaa'} ] }
+            { id: uuid(), title: 'hello world', items: [ {id: 1, text: 'heyyyaaa'} ] }
         ]
     }
 
-    moveCard = (dragIndex, hoverIndex, index) => {
+    moveCard = (dragIndex, hoverIndex, index, cardIndex) => {
         const { cards } = this.state
-        const dragCard = cards[index].items[dragIndex]
+        const dragCard = cards[cardIndex].items[dragIndex]
+        console.log(`dragIndex: ${dragIndex} hoverIndex: ${hoverIndex} index: ${index}` )
+        console.log(cardIndex)
 
-        this.setState(
-            update(this.state, {
-                cards: {
-                    [index]: {
-                        items: {
-                            $splice: [[dragIndex, 1], [hoverIndex, 0, dragCard]],
+        if (index === cardIndex) {
+            this.setState(
+                update(this.state, {
+                    cards: {
+                        [index]: {
+                            items: {
+                                $splice: [[dragIndex, 1], [hoverIndex, 0, dragCard]],
+                            }
                         }
-                    }
-                },
-            }),
-        )
+                    },
+                }),
+            )
+        }
+
+        if (index !== cardIndex) {
+            this.setState(
+                update(this.state, {
+                    cards: {
+                        [index]: {
+                            items: {
+                                $splice: [[hoverIndex, 0, dragCard]],
+                            }
+                        },
+                        [cardIndex]: {
+                            items: {
+                                $splice: [[dragIndex, 1]]
+                            }
+                        }
+                    },
+                }),
+            )
+        }
+
+        console.log(this.state.cards)
     }
 
     submit = (e, cardId, index) => {
@@ -47,7 +72,7 @@ class App extends Component {
                     [index]: {
                         items: {
                             $push: [{
-                                id: this.state.cards[index].items.length + 1,
+                                id: uuid(),
                                 text: inputField
                             }]
                         }
@@ -91,7 +116,6 @@ class App extends Component {
     }
 
     render() {
-        const appContainer = { width: '20%', margin: '0.8em 2em', display: 'inline-block', border: '1px solid black', padding: '2em' };
         return (
             <div style={{width: '100%'}}>
                 {this.state.cards.map((card, cardIndex) => (

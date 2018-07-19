@@ -11,7 +11,7 @@ class Card extends React.Component {
                 <p> {card.title}</p>
                 {card.items.map((item, i) => (
                     <Item key={item.id}
-                          boardIndex={cardIndex}
+                          cardIndex={cardIndex}
                           index={i}
                           id={item.id}
                           text={item.text}
