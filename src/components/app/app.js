@@ -31,14 +31,6 @@ class App extends Component {
         )
     }
 
-    deleteItem = (id) => {
-        this.setState(prevState => {
-            return {
-                items: prevState.items.filter(item => item.id !== id)
-            }
-        })
-    }
-
     submit = (e, cardId, index) => {
         e.preventDefault();
         let inputField = this.state.inputText[index]
@@ -62,7 +54,6 @@ class App extends Component {
                 }
             })
         )
-        console.log(this.state.inputText)
     }
 
     submitCard = (e) => {
@@ -86,15 +77,12 @@ class App extends Component {
                 }
             })
         )
-        console.log(this.state)
     }
 
     inputChange = (e, i) => {
-        console.log(this.state.inputText)
         let inputText = [...this.state.inputText];
         inputText[i] = e.target.value;
         this.setState({ inputText })
-        console.log(inputText)
     }
 
     inputCardChange = (e) => {
@@ -102,12 +90,12 @@ class App extends Component {
     }
 
     render() {
-        const appContainer = { width: '20%', margin: '0 2em', display: 'inline-block' };
+        const appContainer = { width: '20%', margin: '0.8em 2em', display: 'inline-block', border: '1px solid black', padding: '2em' };
         return (
             <div style={{width: '100%'}}>
                 {this.state.boardsCards.map((boardsCard, boardIndex) => (
                     <div style={appContainer} key={boardsCard.id}>
-                        {boardsCard.title}
+                        <p> {boardsCard.title}</p>
                         {boardsCard.items.map((item, i) => (
                             <Card key={item.id}
                                   boardIndex={boardIndex}
@@ -118,7 +106,7 @@ class App extends Component {
 
                         ))}
                         <form key={boardsCard.id}
-                              style={{margin: '1em 2em'}}
+                              style={{margin: '1em 1em 0 1em'}}
                               onSubmit={(e) => this.submit(e, boardsCard.id, boardIndex)}>
                             <input onChange={(e) => this.inputChange(e, boardIndex)}
                                    value={this.state.inputText[boardIndex]}/>
