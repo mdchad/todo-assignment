@@ -1,39 +1,106 @@
-import React from "react"
-import { DragSource } from "react-dnd"
+import * as React from 'react'
+import { findDOMNode } from 'react-dom'
+import { DragSource, DropTarget } from 'react-dnd'
+import flow from 'lodash.flow'
 
-const itemSource = {
-    beginDrag(props) {
-        return props.item
-    },
-    endDrag(props, monitor, component) {
-        if (!monitor.didDrop()) {
-            // drop outside the target
-            return;
-        }
-        // drop inside the target, let the handleDrop
-        return props.handleDrop(props.item.id)
-    }
+const style = {
+    border: '1px dashed gray',
+    padding: '0.5rem 1rem',
+    marginBottom: '.5rem',
+    backgroundColor: 'white',
+    cursor: 'move',
 }
 
-function collect(connect, monitor) {
-    return {
-        connectDragSource: connect.dragSource(),
-        connectDragPreview: connect.dragPreview(),
-        isDragging: monitor.isDragging()
-    }
+const cardSource = {
+    beginDrag(props) {
+        return {
+            id: props.id,
+            index: props.index,
+        }
+    },
+}
+
+const cardTarget = {
+    hover(props, monitor, component) {
+        if (!component) {
+            return null
+        }
+        const dragIndex = monitor.getItem().index
+        const hoverIndex = props.index
+
+        // Don't replace items with themselves
+        if (dragIndex === hoverIndex) {
+            return
+        }
+
+        // Determine rectangle on screen
+        const hoverBoundingRect = (findDOMNode(
+            component,
+        )).getBoundingClientRect()
+
+        // Get vertical middle
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
+
+        // Determine mouse position
+        const clientOffset = monitor.getClientOffset()
+
+        // Get pixels to the top
+        const hoverClientY = (clientOffset).y - hoverBoundingRect.top
+
+        // Only perform the move when the mouse has crossed half of the items height
+        // When dragging downwards, only move when the cursor is below 50%
+        // When dragging upwards, only move when the cursor is above 50%
+        // Dragging downwards
+        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+            return
+        }
+
+        // Dragging upwards
+        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+            return
+        }
+
+        // Time to actually perform the action
+        props.moveCard(dragIndex, hoverIndex, props.cardIndex)
+
+        // Note: we're mutating the monitor itemOld here!
+        // Generally it's better to avoid mutations,
+        // but it's good here for the sake of performance
+        // to avoid expensive index searches.
+        monitor.getItem().index = hoverIndex
+    },
 }
 
 class Item extends React.Component {
     render() {
-        const { isDragging, connectDragSource, item } = this.props
-        const opacity = isDragging ? 0 : 1;
-        const appItem = { border: '1px dotted black', padding: '0.5em 1.2em', margin: '1em 0', opacity: opacity };
-        return connectDragSource(
-            <div style={appItem}>
-                <span>{item.name}</span>
-            </div>
+        const {
+            text,
+            isDragging,
+            connectDragSource,
+            connectDropTarget,
+        } = this.props
+        const opacity = isDragging ? 0 : 1
+
+        return (
+            connectDragSource &&
+            connectDropTarget &&
+            connectDragSource(
+                connectDropTarget(<div style={{ ...style, opacity }}>{text}</div>),
+            )
         )
     }
 }
 
-export default DragSource('item', itemSource, collect)(Item);
+export default flow(
+    DragSource(
+        'item',
+        cardSource,
+        (connect, monitor) => ({
+            connectDragSource: connect.dragSource(),
+            isDragging: monitor.isDragging(),
+        }),
+    ),
+    DropTarget('item', cardTarget, (connect) => ({
+        connectDropTarget: connect.dropTarget(),
+    }))
+)(Item)

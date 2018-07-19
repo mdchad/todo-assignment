@@ -3,24 +3,25 @@ import './app.css';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContext } from 'react-dnd'
 import Card from "../card/card"
+import Item from '../item/item'
 const update = require('immutability-helper')
 
 class App extends Component {
     state = {
         inputText: [''],
         cardTitle: '',
-        boardsCards: [
+        cards: [
             { id: 1, title: 'hello world', items: [ {id: 1, text: 'heyyyaaa'} ] }
         ]
     }
 
     moveCard = (dragIndex, hoverIndex, index) => {
-        const { boardsCards } = this.state
-        const dragCard = boardsCards[index].items[dragIndex]
+        const { cards } = this.state
+        const dragCard = cards[index].items[dragIndex]
 
         this.setState(
             update(this.state, {
-                boardsCards: {
+                cards: {
                     [index]: {
                         items: {
                             $splice: [[dragIndex, 1], [hoverIndex, 0, dragCard]],
@@ -42,11 +43,11 @@ class App extends Component {
                     }
 
                 },
-                boardsCards: {
+                cards: {
                     [index]: {
                         items: {
                             $push: [{
-                                id: this.state.boardsCards[index].items.length + 1,
+                                id: this.state.cards[index].items.length + 1,
                                 text: inputField
                             }]
                         }
@@ -61,16 +62,16 @@ class App extends Component {
         this.setState(
             update(this.state, {
                 inputText: {
-                    [this.state.boardsCards.length]: {
+                    [this.state.cards.length]: {
                         $set: ''
                     }
                 },
                 cardTitle: {
                     $set: ''
                 },
-                boardsCards: {
+                cards: {
                     $push: [{
-                        id: this.state.boardsCards.length + 1,
+                        id: this.state.cards.length + 1,
                         title: this.state.cardTitle,
                         items: []
                     }]
@@ -93,26 +94,14 @@ class App extends Component {
         const appContainer = { width: '20%', margin: '0.8em 2em', display: 'inline-block', border: '1px solid black', padding: '2em' };
         return (
             <div style={{width: '100%'}}>
-                {this.state.boardsCards.map((boardsCard, boardIndex) => (
-                    <div style={appContainer} key={boardsCard.id}>
-                        <p> {boardsCard.title}</p>
-                        {boardsCard.items.map((item, i) => (
-                            <Card key={item.id}
-                                  boardIndex={boardIndex}
-                                  index={i}
-                                  id={item.id}
-                                  text={item.text}
-                                  moveCard={this.moveCard}/>
-
-                        ))}
-                        <form key={boardsCard.id}
-                              style={{margin: '1em 1em 0 1em'}}
-                              onSubmit={(e) => this.submit(e, boardsCard.id, boardIndex)}>
-                            <input onChange={(e) => this.inputChange(e, boardIndex)}
-                                   value={this.state.inputText[boardIndex]}/>
-                            <button type='submit'>Add Item</button>
-                        </form>
-                    </div>
+                {this.state.cards.map((card, cardIndex) => (
+                    <Card card={card}
+                          cardIndex={cardIndex}
+                          key={card.id}
+                          inputText={this.state.inputText[cardIndex]}
+                          inputChange={this.inputChange}
+                          submit={this.submit}
+                          moveCard={this.moveCard}/>
                 ))}
                 <hr/>
                 <form style={{margin: '1em 2em'}} onSubmit={(e) => this.submitCard(e)}>
