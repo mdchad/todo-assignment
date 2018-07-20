@@ -19,6 +19,14 @@ const cardSource = {
             cardI: props.cardIndex
         }
     },
+    endDrag(props, monitor, component) {
+        if (!monitor.didDrop()) {
+            // drop outside the target
+            return
+        }
+        // drop inside the target, let the handleDrop
+        return props.handleDrop(props.id)
+    }
 }
 
 const cardTarget = {
@@ -65,7 +73,7 @@ const cardTarget = {
         // Time to actually perform the action
         props.moveCard(dragIndex, hoverIndex, props.cardIndex, draggingCardIndex)
 
-        // Note: we're mutating the monitor itemOld here!
+        // Note: we're mutating the monitor item here!
         // Generally it's better to avoid mutations,
         // but it's good here for the sake of performance
         // to avoid expensive index searches.

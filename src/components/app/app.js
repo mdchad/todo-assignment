@@ -115,6 +115,10 @@ class App extends Component {
         this.setState({ cardTitle: e.target.value })
     }
 
+    handleDrop = (id) => {
+        console.log('hover' + id)
+    }
+
     render() {
         return (
             <div style={{width: '100%'}}>
@@ -125,6 +129,7 @@ class App extends Component {
                           inputText={this.state.inputText[cardIndex]}
                           inputChange={this.inputChange}
                           submit={this.submit}
+                          handleDrop={this.handleDrop}
                           moveCard={this.moveCard}/>
                 ))}
                 <hr/>
