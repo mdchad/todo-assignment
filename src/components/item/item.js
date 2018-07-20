@@ -18,14 +18,6 @@ const cardSource = {
             index: props.index,
             cardI: props.cardIndex
         }
-    },
-    endDrag(props, monitor, component) {
-        if (!monitor.didDrop()) {
-            // drop outside the target
-            return
-        }
-        // drop inside the target, let the handleDrop
-        return props.handleDrop(props.id)
     }
 }
 
